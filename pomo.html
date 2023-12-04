@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Calculator</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .result {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Pomodoro Calculator</h1>
+    
+    <label for="pomodoroLength">Pomodoro Length (minutes)</label>
+    <input type="number" id="pomodoroLength" value="25" onkeydown="checkEnter(event)">
+
+    <label for="shortBreakLength">Short Break Length (minutes)</label>
+    <input type="number" id="shortBreakLength" value="5" onkeydown="checkEnter(event)">
+
+    <label for="longBreakLength">Long Break Length (minutes)</label>
+    <input type="number" id="longBreakLength" value="15" onkeydown="checkEnter(event)">
+
+    <label for="startTime">Start Time</label>
+    <input type="time" id="startTime" value="" onkeydown="checkEnter(event)">
+
+    <label for="endTime">End Time</label>
+    <input type="time" id="endTime" value="" onkeydown="checkEnter(event)">
+
+    <button onclick="calculatePomodoros()">Calculate Pomodoros</button>
+
+    <p class="result" id="resultTotalPomos"></p>
+    <p class="result" id="resultLongBreaks"></p>
+    <p class="result" id="resultTotalWorkTime"></p>
+
+    <script>
+        function checkEnter(event) {
+            if (event.key === 'Enter') {
+                calculatePomodoros();
+            }
+        }
+
+        function calculatePomodoros() {
+            const pomodoroLength = parseInt(document.getElementById("pomodoroLength").value);
+            const shortBreakLength = parseInt(document.getElementById("shortBreakLength").value);
+            const longBreakLength = parseInt(document.getElementById("longBreakLength").value);
+            const startTime = document.getElementById("startTime").value;
+            const endTime = document.getElementById("endTime").value;
+
+            // Validate input
+            if (isNaN(pomodoroLength) || isNaN(shortBreakLength) || isNaN(longBreakLength)) {
+                alert("Please enter valid numbers for Pomodoro and break lengths.");
+                return;
+            }
+
+            if (startTime === "" || endTime === "") {
+                alert("Please enter start and end times.");
+                return;
+            }
+
+            // Calculate Pomodoros
+            const start = new Date(`2023-01-01 ${startTime}`)
+            const end = new Date(`2023-01-01 ${endTime}`)
+            const totalTime = (end - start) / (1000 * 60) + longBreakLength; // in minutes
+
+            let pomodoroCount = 0
+            let longBreaks = 0
+            let currentTime = start
+
+            const pomoPlusBreak = pomodoroLength + shortBreakLength
+            const superBlock = 4 * pomoPlusBreak + longBreakLength
+            const superBlockCount = Math.floor(totalTime / superBlock)
+
+            const remaingTime = totalTime - superBlock*superBlockCount
+            const remaingPomodoros = Math.floor((remaingTime+shortBreakLength) / pomoPlusBreak)
+
+            pomodoroCount = 4 * superBlockCount + remaingPomodoros
+            longBreaks = superBlockCount - 1
+            if (remaingPomodoros >= 1) {
+                longBreaks++
+            }
+
+            const totalWorkTime = pomodoroLength * pomodoroCount
+            const totalWorkTimeHours = Math.floor(totalWorkTime / 60)
+            const totalWorkTimeMins = totalWorkTime - (60 * totalWorkTimeHours)
+
+            const resultTotalPomos = `Total Pomodoros: ${pomodoroCount}`
+            const resultLongBreaks = `Long Breaks: ${longBreaks}`
+            const resultTotalWorkTime = `Total work time: ${totalWorkTimeHours}h${totalWorkTimeMins}m`
+            document.getElementById("resultTotalPomos").textContent = resultTotalPomos
+            document.getElementById("resultLongBreaks").textContent = resultLongBreaks
+            document.getElementById("resultTotalWorkTime").textContent = resultTotalWorkTime
+        }
+    </script>
+</body>
+</html>
