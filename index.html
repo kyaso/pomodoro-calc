@@ -64,44 +64,120 @@
     <p class="result" id="resultTotalWorkTime"></p>
 
     <script>
+        class Result {
+            constructor(pomodoroCount, longBreaks, totalWorkTimeHours, totalWorkTimeMins) {
+                this.pomodoroCount = pomodoroCount
+                this.longBreaks = longBreaks
+                this.totalWorkTimeHours = totalWorkTimeHours
+                this.totalWorkTimeMins = totalWorkTimeMins
+            }
+        }
+
+        class PomoConfig {
+            constructor(pomodoroLength, shortBreakLength, longBreakLength, longBreakInterval, startTime, endTime) {
+                this.pomodoroLength = pomodoroLength
+                this.shortBreakLength = shortBreakLength
+                this.longBreakLength = longBreakLength
+                this.longBreakInterval = longBreakInterval
+                this.startTime = startTime
+                this.endTime = endTime
+                this.pomosPerSuperBlock = longBreakInterval
+            }
+
+            validateInputs() {
+                if (isNaN(this.pomodoroLength) || isNaN(this.shortBreakLength) || isNaN(this.longBreakLength) || isNaN(this.longBreakInterval)) {
+                    alert("Please enter valid numbers for Pomodoro and break lengths.")
+                    return false
+                }
+                if (startTime === "" || endTime === "") {
+                    alert("Please enter start and end times.")
+                    return false
+                }
+                return true
+            }
+
+            init() {
+                this.initPomo()
+                this.initTotalTime()
+            }
+
+            initTotalTime() {
+                const start = new Date(`2023-01-01 ${this.startTime}`)
+                const end = new Date(`2023-01-01 ${this.endTime}`)
+                this.totalTime = (end - start) / (1000 * 60) // in minutes
+            }
+
+            initPomo() {
+                this.pomodoroCount = 0
+                this.pomoPlusBreak = this.pomodoroLength + this.shortBreakLength
+                this.superBlock = this.pomosPerSuperBlock * this.pomoPlusBreak + (this.longBreakLength-this.shortBreakLength)
+            }
+
+            calcPomosWithSuperBlocks() {
+                if (this.longBreakInterval == 0) {
+                    return
+                }
+
+                while (this.totalTime >= this.superBlock) {
+                    this.pomodoroCount += this.pomosPerSuperBlock
+                    this.totalTime -= this.superBlock
+                }
+            }
+
+            calcPomosWithoutSuperBlocks() {
+                while (this.totalTime >= this.pomoPlusBreak) {
+                    this.pomodoroCount++
+                    this.totalTime -= this.pomoPlusBreak
+                }
+                if (this.totalTime == this.pomodoroLength) {
+                    this.pomodoroCount++
+                }
+            }
+
+            calcLongBreaks() {
+                this.longBreaks = 0
+                if (this.longBreakLength > 0 && this.longBreakInterval != 0) {
+                    this.longBreaks = Math.floor(this.pomodoroCount / this.longBreakInterval)
+                    // Ignore last long break
+                    if (this.pomodoroCount % this.longBreakInterval == 0) {
+                        this.longBreaks--
+                    }
+                }
+            }
+
+            calcResult() {
+                this.totalWorkTime = this.pomodoroLength * this.pomodoroCount
+                this.totalWorkTimeHours = Math.floor(this.totalWorkTime / 60)
+                this.totalWorkTimeMins = this.totalWorkTime - (60 * this.totalWorkTimeHours)
+            }
+
+            calcPomos() {
+                this.init()
+                this.calcPomosWithSuperBlocks()
+                this.calcPomosWithoutSuperBlocks()
+                this.calcLongBreaks()
+                this.calcResult()
+
+                const res = new Result(
+                    this.pomodoroCount,
+                    this.longBreaks,
+                    this.totalWorkTimeHours,
+                    this.totalWorkTimeMins
+                )
+                return res
+            }
+        }
+
         function checkEnter(event) {
             if (event.key === 'Enter') {
                 calculatePomodoros();
             }
         }
 
-        function validateInputs(
-            pomodoroLength,
-            shortBreakLength,
-            longBreakLength,
-            longBreakInterval,
-            startTime,
-            endTime
-        ) {
-            if (isNaN(pomodoroLength) || isNaN(shortBreakLength) || isNaN(longBreakLength) || isNaN(longBreakInterval)) {
-                alert("Please enter valid numbers for Pomodoro and break lengths.")
-                return false
-            }
-
-            if (startTime === "" || endTime === "") {
-                alert("Please enter start and end times.")
-                return false
-            }
-
-            return true
-        }
-
-        function getTotalTime(startTime, endTime) {
-            const start = new Date(`2023-01-01 ${startTime}`)
-            const end = new Date(`2023-01-01 ${endTime}`)
-            const totalTime = (end - start) / (1000 * 60) // in minutes
-            return totalTime
-        }
-
-        function printResult(pomodoroCount, longBreaks, totalWorkTimeHours, totalWorkTimeMins) {
-            const resultTotalPomos = `Total Pomodoros: ${pomodoroCount}`
-            const resultLongBreaks = `Long Breaks: ${longBreaks}`
-            const resultTotalWorkTime = `Total work time: ${totalWorkTimeHours}h${totalWorkTimeMins}m`
+        function printResult(result) {
+            const resultTotalPomos = `Total Pomodoros: ${result.pomodoroCount}`
+            const resultLongBreaks = `Long Breaks: ${result.longBreaks}`
+            const resultTotalWorkTime = `Total work time: ${result.totalWorkTimeHours}h${result.totalWorkTimeMins}m`
             document.getElementById("resultTotalPomos").textContent = resultTotalPomos
             document.getElementById("resultLongBreaks").textContent = resultLongBreaks
             document.getElementById("resultTotalWorkTime").textContent = resultTotalWorkTime
@@ -115,37 +191,20 @@
             const startTime = document.getElementById("startTime").value;
             const endTime = document.getElementById("endTime").value;
 
-            if (!validateInputs(pomodoroLength, shortBreakLength, longBreakLength, longBreakInterval, startTime, endTime)) {
+            const config = new PomoConfig(
+                pomodoroLength,
+                shortBreakLength,
+                longBreakLength,
+                longBreakInterval,
+                startTime,
+                endTime
+            )
+            if (!config.validateInputs()) {
                 return
             }
 
-            let totalTime = getTotalTime(startTime, endTime)
-            let pomodoroCount = 0
-            const pomosPerSuperBlock = longBreakInterval
-            const pomoPlusBreak = pomodoroLength + shortBreakLength
-            const superBlock = pomosPerSuperBlock * pomoPlusBreak + (longBreakLength-shortBreakLength)
-
-            while (totalTime >= superBlock) {
-                pomodoroCount += pomosPerSuperBlock
-                totalTime -= superBlock
-            }
-            while (totalTime >= pomoPlusBreak) {
-                pomodoroCount++
-                totalTime -= pomoPlusBreak
-            }
-            if (totalTime == pomodoroLength) {
-                pomodoroCount++
-            }
-            let longBreaks = Math.floor(pomodoroCount / longBreakInterval)
-            // Ignore last long break
-            if (pomodoroCount % longBreakInterval == 0) {
-                longBreaks--
-            }
-
-            const totalWorkTime = pomodoroLength * pomodoroCount
-            const totalWorkTimeHours = Math.floor(totalWorkTime / 60)
-            const totalWorkTimeMins = totalWorkTime - (60 * totalWorkTimeHours)
-            printResult(pomodoroCount, longBreaks, totalWorkTimeHours, totalWorkTimeMins)
+            result = config.calcPomos()
+            printResult(result)
         }
     </script>
 </body>
