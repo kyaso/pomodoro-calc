@@ -19,20 +19,33 @@
         input {
             width: 100%;
             padding: 8px;
+        }
+
+        input[type=time] {
             margin-bottom: 20px;
         }
 
         button {
-            background-color: #4CAF50;
-            color: white;
             padding: 10px 20px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        #calcPomoButton {
+            background-color: #4CAF50;
+            color: white;
+            margin-top: 20px;
         }
 
         .result {
             font-weight: bold;
+        }
+
+        .sliderValue {
+            cursor: pointer;
+            margin-bottom: 30px;
         }
     </style>
 </head>
@@ -40,30 +53,68 @@
     <h1>Pomodoro Calculator</h1>
 
     <label for="pomodoroLength">Pomodoro Length (minutes)</label>
-    <input type="number" id="pomodoroLength" value="25" onkeydown="checkEnter(event)">
+    <input id="pomodoroLengthSlider" type="range" min="5" max="120" step="1" value="25" oninput="onSliderChange('pomodoroLengthValue', this.value)">
+    <p class="sliderValue" id="pomodoroLengthValue" onclick="resetSlider('pomodoroLengthSlider', 'pomodoroLengthValue', 25)">25</p>
 
     <label for="shortBreakLength">Short Break Length (minutes)</label>
-    <input type="number" id="shortBreakLength" value="5" onkeydown="checkEnter(event)">
+    <input id="shortBreakLengthSlider" type="range" min="0" max="10" step="1" value="5" oninput="onSliderChange('shortBreakLengthValue', this.value)">
+    <p class="sliderValue" id="shortBreakLengthValue" onclick="resetSlider('shortBreakLengthSlider', 'shortBreakLengthValue', 5)">5</p>
 
     <label for="longBreakLength">Long Break Length (minutes)</label>
-    <input type="number" id="longBreakLength" value="15" onkeydown="checkEnter(event)">
+    <input id="longBreakLengthSlider" type="range" min="0" max="60" step="1" value="15" oninput="onSliderChange('longBreakLengthValue', this.value)">
+    <p class="sliderValue" id="longBreakLengthValue" onclick="resetSlider('longBreakLengthSlider', 'longBreakLengthValue', 15)">15</p>
 
     <label for="longBreakInterval">Long Break Interval (#pomodoros)</label>
-    <input type="number" id="longBreakInterval" value="4" onkeydown="checkEnter(event)">
+    <input id="longBreakIntervalSlider" type="range" min="0" max="10" step="1" value="4" oninput="onSliderChange('longBreakIntervalValue', this.value)">
+    <p class="sliderValue" id="longBreakIntervalValue" onclick="resetSlider('longBreakIntervalSlider', 'longBreakIntervalValue', 4)">4</p>
 
     <label for="startTime">Start Time</label>
     <input type="time" id="startTime" value="" onkeydown="checkEnter(event)">
+    <button id="currentTimeButton" onclick="setCurrentTime()">Now</button>
 
     <label for="endTime">End Time</label>
     <input type="time" id="endTime" value="" onkeydown="checkEnter(event)">
 
-    <button onclick="calculatePomodoros()">Calculate Pomodoros</button>
+    <button id="calcPomoButton" onclick="calculatePomodoros()">Calculate Pomodoros</button>
 
     <p class="result" id="resultTotalPomos"></p>
     <p class="result" id="resultLongBreaks"></p>
     <p class="result" id="resultTotalWorkTime"></p>
 
     <script>
+        function checkEnter(event) {
+            if (event.key === 'Enter') {
+                calculatePomodoros();
+            }
+        }
+
+        function setCurrentTime() {
+            const startTimeInput = document.getElementById("startTime");
+            const currentTime = new Date();
+            const hours = currentTime.getHours().toString().padStart(2, '0');
+            const minutes = currentTime.getMinutes().toString().padStart(2, '0');
+            const currentTimeString = `${hours}:${minutes}`;
+
+            startTimeInput.value = currentTimeString;
+        }
+
+        function onSliderChange(id, value) {
+            var sliderText = document.getElementById(id)
+            sliderText.textContent = value
+
+            calculatePomodoros()
+        }
+
+        function resetSlider(sliderId, valueId, defaultValue) {
+            const slider = document.getElementById(sliderId)
+            const sliderValue = document.getElementById(valueId)
+
+            slider.value = defaultValue
+            sliderValue.textContent = defaultValue
+
+            calculatePomodoros()
+        }
+
         class Result {
             constructor(pomodoroCount, longBreaks, totalWorkTimeHours, totalWorkTimeMins) {
                 this.pomodoroCount = pomodoroCount
@@ -89,7 +140,7 @@
                     alert("Please enter valid numbers for Pomodoro and break lengths.")
                     return false
                 }
-                if (startTime === "" || endTime === "") {
+                if (this.startTime === "" || this.endTime === "") {
                     alert("Please enter start and end times.")
                     return false
                 }
@@ -168,12 +219,6 @@
             }
         }
 
-        function checkEnter(event) {
-            if (event.key === 'Enter') {
-                calculatePomodoros();
-            }
-        }
-
         function printResult(result) {
             const resultTotalPomos = `Total Pomodoros: ${result.pomodoroCount}`
             const resultLongBreaks = `Long Breaks: ${result.longBreaks}`
@@ -184,10 +229,10 @@
         }
 
         function calculatePomodoros() {
-            const pomodoroLength = parseInt(document.getElementById("pomodoroLength").value);
-            const shortBreakLength = parseInt(document.getElementById("shortBreakLength").value);
-            const longBreakLength = parseInt(document.getElementById("longBreakLength").value);
-            const longBreakInterval = parseInt(document.getElementById("longBreakInterval").value);
+            const pomodoroLength = parseInt(document.getElementById("pomodoroLengthSlider").value);
+            const shortBreakLength = parseInt(document.getElementById("shortBreakLengthSlider").value);
+            const longBreakLength = parseInt(document.getElementById("longBreakLengthSlider").value);
+            const longBreakInterval = parseInt(document.getElementById("longBreakIntervalSlider").value);
             const startTime = document.getElementById("startTime").value;
             const endTime = document.getElementById("endTime").value;
 
