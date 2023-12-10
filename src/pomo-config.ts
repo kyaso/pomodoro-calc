@@ -86,7 +86,7 @@ export default class PomoConfig {
   initTotalTime() {
     const start = new Date(`2023-01-01 ${this.startTime}`)
     const end = new Date(`2023-01-01 ${this.endTime}`)
-    this.totalTime = (end - start) / (1000 * 60) // in minutes
+    this.totalTime = (end.valueOf() - start.valueOf()) / (1000 * 60) // in minutes
   }
 
   initPomo() {
