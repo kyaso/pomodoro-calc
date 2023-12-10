@@ -88,6 +88,9 @@
         constants
       }
     },
+    mounted() {
+      this.setCurrentTime()
+    },
     computed: {
       result() {
         const config = new PomoConfig(
@@ -104,6 +107,18 @@
       }
     },
     methods: {
+      setCurrentTime() {
+        const currentTime = new Date()
+        const endTime = new Date()
+        endTime.setHours(endTime.getHours() + 2)
+        this.startTime = this.date2string(currentTime)
+        this.endTime = this.date2string(endTime)
+      },
+      date2string(date: Date) {
+        const hours = date.getHours().toString().padStart(2, '0')
+        const minutes = date.getMinutes().toString().padStart(2, '0')
+        return `${hours}:${minutes}`
+      }
     }
 
   })
