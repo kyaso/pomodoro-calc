@@ -1,4 +1,4 @@
-class Result {
+export class Result {
   pomodoroCount: number
   longBreaks: number
   totalWorkTimeHours: number

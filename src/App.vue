@@ -1,13 +1,14 @@
 <template>
   <v-app>
     <v-main>
-      <h1 class="text-center">Pomodoro Calculator</h1>
+      <div class="text-h2 text-center mt-4">Pomodoro Calculator</div>
       <div class="pt-9 mx-16">
         <Slider
           :name="'Pomodoro Length (minutes)'"
           :min="5"
           :max="120"
           :step="1"
+          :color="'red'"
           v-model="pomodoroLength"  />
 
           <Slider
@@ -15,6 +16,7 @@
           :min="0"
           :max="10"
           :step="1"
+          :color="'light-green'"
           v-model="shortBreakLength"  />
 
           <Slider
@@ -22,6 +24,7 @@
           :min="0"
           :max="60"
           :step="1"
+          :color="'blue-accent-1'"
           v-model="longBreakLength"  />
 
           <Slider
@@ -29,12 +32,34 @@
           :min="0"
           :max="10"
           :step="1"
+          :color="'blue-accent-1'"
           v-model="longBreakInterval"  />
 
-          <input type="time" id="startTime" v-model="startTime" >
-          <input type="time" id="endTime" v-model="endTime" >
+          <!-- Time pickers -->
+          <v-container class="text-body-1">
+            <v-row class="font-weight-medium">
+              <v-col>
+                Start Time:
+              </v-col>
+              <v-col>
+                End Time:
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <input type="time" id="startTime" v-model="startTime" >
+              </v-col>
+              <v-col>
+                <input type="time" id="endTime" v-model="endTime" >
+              </v-col>
+            </v-row>
+          </v-container>
 
-          <p>{{ result.pomodoroCount}}, {{result.longBreaks}}, {{result.totalWorkTimeHours}}:{{result.totalWorkTimeMins }}</p>
+          <v-container fluid class="mt-10">
+            <v-row justify="center">
+              <ResultCard :result="result" />
+            </v-row>
+          </v-container>
       </div>
     </v-main>
   </v-app>
@@ -43,20 +68,24 @@
 <script lang="ts">
   import { defineComponent } from 'vue'
   import Slider from './components/Slider.vue'
+  import ResultCard from './components/ResultCard.vue'
   import PomoConfig from './pomo-config'
+  import constants from './constants'
 
   export default defineComponent({
     components: {
-      Slider
+      Slider,
+      ResultCard
     },
     data() {
       return {
-        pomodoroLength: 25,
-        shortBreakLength: 5,
-        longBreakLength: 15,
-        longBreakInterval: 4,
+        pomodoroLength: constants.POMODORO_LENGTH,
+        shortBreakLength: constants.SHORT_BREAK_LENGTH,
+        longBreakLength: constants.LONG_BREAK_LENGTH,
+        longBreakInterval: constants.LONG_BREAK_INTERVAL,
         startTime: "10:00",
-        endTime: "12:00"
+        endTime: "12:00",
+        constants
       }
     },
     computed: {
