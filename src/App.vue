@@ -48,6 +48,7 @@
             <v-row>
               <v-col>
                 <input type="time" id="startTime" v-model="startTime" >
+                <v-btn class="ml-5" @click="setCurrentTime" variant="tonal">Now</v-btn>
               </v-col>
               <v-col>
                 <input type="time" id="endTime" v-model="endTime" >
@@ -89,7 +90,7 @@
       }
     },
     mounted() {
-      this.setCurrentTime()
+      this.initTimes()
     },
     computed: {
       result() {
@@ -107,12 +108,16 @@
       }
     },
     methods: {
-      setCurrentTime() {
+      initTimes() {
         const currentTime = new Date()
         const endTime = new Date()
         endTime.setHours(endTime.getHours() + 2)
         this.startTime = this.date2string(currentTime)
         this.endTime = this.date2string(endTime)
+      },
+      setCurrentTime() {
+        const currentTime = new Date()
+        this.startTime = this.date2string(currentTime)
       },
       date2string(date: Date) {
         const hours = date.getHours().toString().padStart(2, '0')
