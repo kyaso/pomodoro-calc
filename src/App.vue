@@ -50,11 +50,21 @@
             </v-row>
             <v-row>
               <v-col>
-                <input type="time" id="startTime" v-model="startTime" >
-                <v-btn class="ml-5" @click="setCurrentTime" variant="tonal">Now</v-btn>
+                <v-text-field
+                  type="time"
+                  variant="underlined"
+                  v-model="startTime"
+                  density="compact">
+                </v-text-field>
+                <v-btn @click="setCurrentTime" variant="tonal">Now</v-btn>
               </v-col>
               <v-col>
-                <input type="time" id="endTime" v-model="endTime" >
+                <v-text-field
+                  type="time"
+                  variant="underlined"
+                  v-model="endTime"
+                  density="compact">
+                </v-text-field>
               </v-col>
               <v-col>
                 <v-text-field
@@ -63,7 +73,7 @@
                   v-model="breakTime"
                   clearable
                   density="compact"
-                  suffix="min">
+                  suffix="minutes">
                 </v-text-field>
               </v-col>
             </v-row>
