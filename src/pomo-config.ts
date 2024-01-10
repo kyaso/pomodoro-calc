@@ -24,6 +24,7 @@ export default class PomoConfig {
   longBreakInterval: number
   startTime: string
   endTime: string
+  breakTime: number
   pomosPerSuperBlock: number
 
   totalTime: number
@@ -41,7 +42,8 @@ export default class PomoConfig {
     longBreakLength: number,
     longBreakInterval: number,
     startTime: string,
-    endTime: string
+    endTime: string,
+    breakTime: number
   ) {
     this.pomodoroLength = pomodoroLength
     this.shortBreakLength = shortBreakLength
@@ -49,6 +51,7 @@ export default class PomoConfig {
     this.longBreakInterval = longBreakInterval
     this.startTime = startTime
     this.endTime = endTime
+    this.breakTime = breakTime
     this.pomosPerSuperBlock = longBreakInterval
 
     this.totalTime = 0
@@ -86,7 +89,7 @@ export default class PomoConfig {
   initTotalTime() {
     const start = new Date(`2023-01-01 ${this.startTime}`)
     const end = new Date(`2023-01-01 ${this.endTime}`)
-    this.totalTime = (end.valueOf() - start.valueOf()) / (1000 * 60) // in minutes
+    this.totalTime = (end.valueOf() - start.valueOf()) / (1000 * 60) - this.breakTime // in minutes
   }
 
   initPomo() {

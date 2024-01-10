@@ -44,6 +44,9 @@
               <v-col>
                 End Time:
               </v-col>
+              <v-col>
+                Break:
+              </v-col>
             </v-row>
             <v-row>
               <v-col>
@@ -52,6 +55,16 @@
               </v-col>
               <v-col>
                 <input type="time" id="endTime" v-model="endTime" >
+              </v-col>
+              <v-col>
+                <v-text-field
+                  type="number"
+                  variant="underlined"
+                  v-model="breakTime"
+                  clearable
+                  density="compact"
+                  suffix="min">
+                </v-text-field>
               </v-col>
             </v-row>
           </v-container>
@@ -86,6 +99,7 @@
         longBreakInterval: constants.LONG_BREAK_INTERVAL,
         startTime: "10:00",
         endTime: "12:00",
+        breakTime: 30,
         constants
       }
     },
@@ -100,7 +114,8 @@
           this.longBreakLength,
           this.longBreakInterval,
           this.startTime,
-          this.endTime
+          this.endTime,
+          this.breakTime
         )
 
         const res = config.calcPomos()
